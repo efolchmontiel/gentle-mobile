@@ -553,7 +553,7 @@
     <string name="voz_engine_label">Motor de dictado</string>
     <string name="voz_engine_keyboard">Teclado del teléfono</string>
     <string name="voz_engine_keyboard_sub">Funciona hoy — no necesita modelo.</string>
-    <string name="voz_engine_whisper">Whisper local</string>
+    <string name="voz_engine_whisper">Whisper</string>
     <string name="voz_engine_whisper_sub">Graba y transcribe en este teléfono.</string>
     <string name="voz_engine_whisper_no_model">Descarga un modelo abajo — hasta entonces se usa el teclado.</string>
     <string name="voz_auto_send_label">Después del dictado</string>

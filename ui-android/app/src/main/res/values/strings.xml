@@ -553,7 +553,7 @@
     <string name="voz_engine_label">Dictation engine</string>
     <string name="voz_engine_keyboard">Phone keyboard</string>
     <string name="voz_engine_keyboard_sub">Works today — no model needed.</string>
-    <string name="voz_engine_whisper">Local Whisper</string>
+    <string name="voz_engine_whisper">Whisper</string>
     <string name="voz_engine_whisper_sub">Records and transcribes on this phone.</string>
     <string name="voz_engine_whisper_no_model">Download a model below — until then, the keyboard is used.</string>
     <string name="voz_auto_send_label">After dictation</string>
