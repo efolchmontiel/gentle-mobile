@@ -28,6 +28,13 @@ class ModelManager(
     private val machines = ConcurrentHashMap<String, ModelDownloadStateMachine>()
     private val cancelFlags = ConcurrentHashMap.newKeySet<String>()
 
+    /** Deliver a state change on the main thread (the class's contract), so
+     *  the Compose snapshot state behind [onState] is only touched there even
+     *  when the download loop runs on the executor. */
+    private fun emit(id: String, status: ModelStatus) {
+        mainHandler.post { onState(id, status) }
+    }
+
     /** Re-read disk and report the current state of every model. */
     fun refresh() {
         repository.ensureDir()
@@ -38,7 +45,7 @@ class ModelManager(
             if (size != null) {
                 machine.hydrateInstalled(size)
             }
-            onState(model.id, machine.state)
+            emit(model.id, machine.state)
         }
     }
 
@@ -53,7 +60,7 @@ class ModelManager(
         repository.ensureDir()
         val machine = machines.computeIfAbsent(model.id) { ModelDownloadStateMachine() }
         machine.start(totalBytes = null)
-        onState(model.id, machine.state)
+        emit(model.id, machine.state)
         executor.execute { runDownload(model, machine) }
     }
 
@@ -62,7 +69,7 @@ class ModelManager(
         cancelFlags.add(model.id)
         machines[model.id]?.let { machine ->
             machine.cancel()
-            onState(model.id, machine.state)
+            emit(model.id, machine.state)
         }
     }
 
@@ -71,7 +78,7 @@ class ModelManager(
         cancel(model)
         repository.delete(model)
         machines.remove(model.id)
-        onState(model.id, ModelStatus.NotInstalled)
+        emit(model.id, ModelStatus.NotInstalled)
     }
 
     private fun runDownload(model: WhisperModel, machine: ModelDownloadStateMachine) {
@@ -99,7 +106,7 @@ class ModelManager(
                 while (true) {
                     if (cancelFlags.contains(model.id)) {
                         machine.cancel()
-                        onState(model.id, machine.state)
+                        emit(model.id, machine.state)
                         tmp.delete()
                         return
                     }
@@ -108,7 +115,7 @@ class ModelManager(
                     out.write(buffer, 0, read)
                     received += read
                     machine.progress(received, total)
-                    onState(model.id, machine.state)
+                    emit(model.id, machine.state)
                 }
             }
             if (!tmp.renameTo(repository.fileFor(model))) {
@@ -116,11 +123,11 @@ class ModelManager(
                 return
             }
             machine.complete(repository.onDiskSize(model) ?: tmp.length())
-            onState(model.id, machine.state)
+            emit(model.id, machine.state)
         } catch (error: Exception) {
             if (cancelFlags.contains(model.id)) {
                 machine.cancel()
-                onState(model.id, machine.state)
+                emit(model.id, machine.state)
                 tmp.delete()
             } else {
                 fail(model, machine, error.message ?: "download failed")
@@ -133,7 +140,7 @@ class ModelManager(
 
     private fun fail(model: WhisperModel, machine: ModelDownloadStateMachine, message: String) {
         machine.fail(message)
-        onState(model.id, machine.state)
+        emit(model.id, machine.state)
         repository.tempFileFor(model).delete()
     }
 }
