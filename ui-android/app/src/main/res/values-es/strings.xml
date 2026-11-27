@@ -57,6 +57,7 @@
     <string name="pair_button">Conectar</string>
     <string name="pair_button_pairing">Emparejando\u2026</string>
     <string name="pair_button_connecting">Conectando\u2026</string>
+    <string name="pair_cancel">Cancelar</string>
     <string name="pair_status_pairing">Emparejando — enviando la clave de este teléfono a %1$s\u2026</string>
     <string name="pair_status_accepted">Clave aceptada — conectando\u2026</string>
     <string name="pair_status_probing">Verificando la clave del host, después abrimos el puente\u2026</string>

@@ -53,6 +53,7 @@ import androidx.compose.foundation.text.selection.SelectionContainer
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.TextButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
@@ -2596,6 +2597,24 @@ fun ConnectScreen(
                         fontSize = 11.sp,
                         fontFamily = FontFamily.Monospace,
                     )
+                    // A connect that stalls (the host never answers the bridge)
+                    // must not trap the user: Cancel drops the attempt and
+                    // returns to the form. The in-flight worker's results are
+                    // discarded by the generation bump.
+                    TextButton(
+                        onClick = {
+                            screen.generation += 1
+                            screen.machine.reset()
+                            pairStatus = null
+                            screen.ui = UiState.Form
+                        },
+                        modifier = Modifier.fillMaxWidth(),
+                    ) {
+                        Text(
+                            text = stringResource(R.string.pair_cancel),
+                            color = LocalPalette.current.muted,
+                        )
+                    }
                 }
                 if (current is UiState.Failed) {
                     Notice(current.message, LocalPalette.current.error)
