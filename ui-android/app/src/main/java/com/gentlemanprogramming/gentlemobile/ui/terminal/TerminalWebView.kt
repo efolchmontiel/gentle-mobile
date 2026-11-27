@@ -67,6 +67,18 @@ class TerminalWebController {
     /** Focus xterm's own textarea so the IME opens in direct mode. */
     fun focus() = post(XtermMessages.focus())
 
+    /** Tear down the WebView when the terminal leaves the screen: drop the JS
+     *  bridge and destroy the view so its JS context and page timers do not
+     *  leak, and reset so a later re-entry builds a fresh one. */
+    fun dispose() {
+        val wv = webView ?: return
+        wv.removeJavascriptInterface("AndroidBridge")
+        wv.destroy()
+        webView = null
+        initialized = false
+        synchronized(pending) { pending.clear() }
+    }
+
     private fun reinit() {
         val t = themeJson ?: return
         val f = fontCss ?: return
@@ -187,6 +199,7 @@ fun TerminalWebView(
 
     AndroidView(
         factory = { context -> controller.newWebView(context) },
+        onRelease = { controller.dispose() },
         modifier = modifier,
     )
 }
