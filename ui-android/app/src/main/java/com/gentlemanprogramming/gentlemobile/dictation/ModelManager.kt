@@ -92,9 +92,9 @@ class ModelManager(
                 return
             }
             val total = connection.contentLengthLong.takeIf { it > 0 }
+            var received = 0L
             FileOutputStream(tmp).use { out ->
                 val buffer = ByteArray(64 * 1024)
-                var received = 0L
                 val input = connection.inputStream
                 while (true) {
                     if (cancelFlags.contains(model.id)) {
@@ -110,6 +110,10 @@ class ModelManager(
                     machine.progress(received, total)
                     onState(model.id, machine.state)
                 }
+            }
+            if (!downloadIsComplete(received, total)) {
+                fail(model, machine, "download incomplete: $received of $total bytes")
+                return
             }
             if (!tmp.renameTo(repository.fileFor(model))) {
                 fail(model, machine, "download could not be finalised")
@@ -137,3 +141,8 @@ class ModelManager(
         repository.tempFileFor(model).delete()
     }
 }
+
+/** A download is complete only when every advertised byte arrived; an unknown
+ *  Content-Length cannot be verified, so it is accepted. */
+internal fun downloadIsComplete(received: Long, contentLength: Long?): Boolean =
+    contentLength == null || received == contentLength
