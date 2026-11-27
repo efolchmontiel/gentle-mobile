@@ -483,6 +483,8 @@
     <string name="dict_network_failed">The recognizer\u2019s network service failed — the on-device engine avoids this.</string>
     <string name="dict_busy">The recognizer was busy — try again in a moment.</string>
     <string name="dict_failed">Dictation failed (recognizer error %1$d).</string>
+    <string name="dict_language_unsupported">The phone’s recognizer does not support this language — the on-device Whisper engine avoids this.</string>
+    <string name="dict_audio_failed">The microphone could not be read — nothing was recorded.</string>
 
     <!-- Pairing refusals -->
     <string name="pair_err_network">Can\'t reach %1$s — check that both devices are on the same network, or that Tailscale is connected.</string>

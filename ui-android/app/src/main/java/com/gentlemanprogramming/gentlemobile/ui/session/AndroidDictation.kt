@@ -171,15 +171,32 @@ class AndroidDictationEngine(private val context: Context) : DictationEngine {
             bundle?.getStringArrayList(SpeechRecognizer.RESULTS_RECOGNITION)?.firstOrNull()
 
         /** The recognizer's error codes, in words the composer can show. */
-        private fun describe(error: Int) = when (error) {
-            SpeechRecognizer.ERROR_NO_MATCH -> context.getString(R.string.dict_no_speech)
-            SpeechRecognizer.ERROR_SPEECH_TIMEOUT -> context.getString(R.string.dict_silent)
-            SpeechRecognizer.ERROR_INSUFFICIENT_PERMISSIONS ->
-                context.getString(R.string.dict_permission_refused)
-            SpeechRecognizer.ERROR_NETWORK, SpeechRecognizer.ERROR_NETWORK_TIMEOUT ->
-                context.getString(R.string.dict_network_failed)
-            SpeechRecognizer.ERROR_RECOGNIZER_BUSY -> context.getString(R.string.dict_busy)
-            else -> context.getString(R.string.dict_failed, error)
+        private fun describe(error: Int): String {
+            val message = dictationErrorMessageId(error)
+            return if (message == R.string.dict_failed) {
+                context.getString(message, error)
+            } else {
+                context.getString(message)
+            }
         }
     }
+}
+
+/** The string resource for a [SpeechRecognizer] error code. [R.string.dict_failed]
+ *  is the generic fallback and carries the raw code as its format argument;
+ *  every other id is a complete message. */
+internal fun dictationErrorMessageId(error: Int): Int = when (error) {
+    SpeechRecognizer.ERROR_NO_MATCH -> R.string.dict_no_speech
+    SpeechRecognizer.ERROR_SPEECH_TIMEOUT -> R.string.dict_silent
+    SpeechRecognizer.ERROR_INSUFFICIENT_PERMISSIONS -> R.string.dict_permission_refused
+    SpeechRecognizer.ERROR_NETWORK,
+    SpeechRecognizer.ERROR_NETWORK_TIMEOUT,
+    SpeechRecognizer.ERROR_SERVER,
+    SpeechRecognizer.ERROR_SERVER_DISCONNECTED -> R.string.dict_network_failed
+    SpeechRecognizer.ERROR_RECOGNIZER_BUSY,
+    SpeechRecognizer.ERROR_TOO_MANY_REQUESTS -> R.string.dict_busy
+    SpeechRecognizer.ERROR_LANGUAGE_NOT_SUPPORTED,
+    SpeechRecognizer.ERROR_LANGUAGE_UNAVAILABLE -> R.string.dict_language_unsupported
+    SpeechRecognizer.ERROR_AUDIO -> R.string.dict_audio_failed
+    else -> R.string.dict_failed
 }

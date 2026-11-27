@@ -483,6 +483,8 @@
     <string name="dict_network_failed">El servicio de red del reconocedor falló — el motor en el dispositivo lo evita.</string>
     <string name="dict_busy">El reconocedor estaba ocupado — probá de nuevo en un momento.</string>
     <string name="dict_failed">El dictado falló (error de reconocedor %1$d).</string>
+    <string name="dict_language_unsupported">El reconocedor del teléfono no admite este idioma — el motor Whisper local lo evita.</string>
+    <string name="dict_audio_failed">No se pudo leer el micrófono — no se grabó nada.</string>
 
     <!-- Rechazos del emparejamiento -->
     <string name="pair_err_network">No se puede llegar a %1$s — revisá que los dos equipos estén en la misma red o que Tailscale esté conectado.</string>
