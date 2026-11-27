@@ -132,6 +132,7 @@ fun TerminalScreen(
     currentWorkspaceId: String,
     currentPaneId: String,
     onStart: (cols: Int, rows: Int) -> Unit,
+    onReconnect: (cols: Int, rows: Int) -> Unit,
     onBack: () -> Unit,
     onCreateTab: () -> Unit,
     onDeleteTab: (PaneSwitcherModel.TabRow) -> Unit,
@@ -162,6 +163,8 @@ fun TerminalScreen(
     val controller = remember { TerminalWebController() }
     var rendererReady by remember { mutableStateOf(false) }
     var closed by remember { mutableStateOf(false) }
+    var lastCols by remember { mutableStateOf(0) }
+    var lastRows by remember { mutableStateOf(0) }
     var input by remember { mutableStateOf(TextFieldValue("")) }
     val composer = remember { TerminalComposer() }
     var paneSheet by remember { mutableStateOf(false) }
@@ -364,6 +367,8 @@ fun TerminalScreen(
                 controller = controller,
                 onData = { bytes -> session?.write(bytes) },
                 onResize = { cols, rows ->
+                    lastCols = cols
+                    lastRows = rows
                     val s = session
                     if (s == null) {
                         onStart(cols, rows)
@@ -396,8 +401,8 @@ fun TerminalScreen(
             }
             val overlay = when {
                 error != null -> error
-                closed -> "The shell has ended."
                 starting -> "Starting the shell…"
+                closed -> "The shell has ended."
                 else -> null
             }
             if (overlay != null) {
@@ -405,12 +410,24 @@ fun TerminalScreen(
                     modifier = Modifier.fillMaxSize(),
                     contentAlignment = Alignment.Center,
                 ) {
-                    Text(
-                        text = overlay,
-                        color = palette.muted,
-                        fontSize = 14.sp,
-                        fontFamily = FontFamily.Monospace,
-                    )
+                    Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                        Text(
+                            text = overlay,
+                            color = palette.muted,
+                            fontSize = 14.sp,
+                            fontFamily = FontFamily.Monospace,
+                        )
+                        if ((closed || error != null) && !starting && lastCols > 0 && lastRows > 0) {
+                            TextButton(onClick = { onReconnect(lastCols, lastRows) }) {
+                                Text(
+                                    text = stringResource(R.string.terminal_reconnect),
+                                    color = palette.accent,
+                                    fontSize = 14.sp,
+                                    fontFamily = FontFamily.Monospace,
+                                )
+                            }
+                        }
+                    }
                 }
             }
             if (clipboardNotice != null) {

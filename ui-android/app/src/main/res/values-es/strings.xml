@@ -183,6 +183,7 @@
     <!-- T36: el selector de paneles — la tira de la tarjeta abre la hoja con los paneles del espacio -->
     <string name="session_panes">Paneles</string>
     <string name="session_pane_shell">shell</string>
+    <string name="terminal_reconnect">Reconectar</string>
     <string name="terminal_new_tab">Nueva pestaña</string>
     <string name="cd_delete_tab">Eliminar pestaña</string>
     <string name="set_tab_delete_title">¿Eliminar esta pestaña?</string>

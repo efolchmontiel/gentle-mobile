@@ -181,6 +181,7 @@
     <!-- T36: the pane switcher — the strip on the card opens the workspace's pane sheet -->
     <string name="session_panes">Panes</string>
     <string name="session_pane_shell">shell</string>
+    <string name="terminal_reconnect">Reconnect</string>
     <string name="terminal_new_tab">New tab</string>
     <string name="cd_delete_tab">Delete tab</string>
     <string name="set_tab_delete_title">Delete this tab?</string>

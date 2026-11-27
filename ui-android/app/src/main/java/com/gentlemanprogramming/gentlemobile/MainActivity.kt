@@ -2954,6 +2954,30 @@ fun ConnectScreen(
                             }
                         }
                     },
+                    onReconnect = { cols, rows ->
+                        if (profile != null && !screen.terminalStarting) {
+                            screen.terminalSession?.closeSession()
+                            screen.terminalSession = null
+                            screen.terminalStarting = true
+                            screen.terminalError = null
+                            val cwd = screen.terminalCwd.orEmpty()
+                            executor.execute {
+                                try {
+                                    val started = coreStartTerminal(profile, cwd, cols.toUInt(), rows.toUInt())
+                                    mainHandler.post {
+                                        screen.terminalSession = started
+                                        screen.terminalStarting = false
+                                        screen.terminalError = null
+                                    }
+                                } catch (e: Exception) {
+                                    mainHandler.post {
+                                        screen.terminalStarting = false
+                                        screen.terminalError = describe(context, e)
+                                    }
+                                }
+                            }
+                        }
+                    },
                     onBack = {
                         screen.terminalSession?.closeSession()
                         screen.terminalSession = null
